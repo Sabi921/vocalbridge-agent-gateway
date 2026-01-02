@@ -17,6 +17,7 @@ This repository implements a multi-tenant Agent Gateway: a backend service that 
 - Usage/analytics tables (totals, by provider, top agents)
 
 2. Agent Gateway API (Express)
+
 Core modules:
 - Middleware
     - requestId: attach a correlation ID to each request 
@@ -35,6 +36,7 @@ Core modules:
     - usage.service: compute + persist cost and usage events
 
 3. SQLite Database
+
 Stores:
 - Tenants (hashed API keys)
 - Agents (per-tenant config)
@@ -66,6 +68,7 @@ Stores:
 - This guarantees no cross-tenant access even if an attacker guesses IDs.
 
 **Failure Handling and Reliability**
+
 Structured errors
 - No stack traces returned to client.
 - Error shape:
@@ -74,6 +77,7 @@ Structured errors
     - message 
 
 Vendor call reliability
+
 For each provider call:
 - Timeout enforced (per-vendor)
 - Retries on transient errors:
@@ -84,12 +88,12 @@ For each provider call:
 - If primary fails after retries, attempt fallback 
 
 Provider call tracing
-- Each attempt records a ProviderCallEvent:
-    - provider name
-    - status (success/failure)
-    - latencyMs
-    - errorCode (if any)
-    - requestId/correlationId
+Each attempt records a ProviderCallEvent:
+- provider name
+- status (success/failure)
+- latencyMs
+- errorCode (if any)
+- requestId/correlationId
 
 ## Low-Level Design
 
@@ -100,6 +104,7 @@ Provider call tracing
 - name (TEXT)
 - apiKeyHash (TEXT)
 - createdAt (TEXT ISO)
+
 Purpose: tenant identity + secure API key verification.
 
 **Agent**
@@ -111,6 +116,7 @@ Purpose: tenant identity + secure API key verification.
 - systemPrompt (TEXT)
 - enabledToolsJson (nullable TEXT JSON)
 - createdAt
+
 Purpose: per-tenant bot configuration and extensibility (tools).
 
 **Session**
@@ -120,6 +126,7 @@ Purpose: per-tenant bot configuration and extensibility (tools).
 - customerId
 - metadataJson
 - createdAt
+
 Purpose: conversation container for a tenant+agent+customer.
 
 **Message**
@@ -129,6 +136,7 @@ Purpose: conversation container for a tenant+agent+customer.
 - role (user | assistant)
 - content
 - createdAt
+
 Purpose: full transcript.
 
 **ProviderCallEvent**
@@ -142,6 +150,7 @@ Purpose: full transcript.
 - errorCode (nullable)
 - requestId (nullable)
 - createdAt
+
 Purpose: reliability visibility (timeouts/retries/fallback).
 
 **UsageEvent**
@@ -154,6 +163,7 @@ Purpose: reliability visibility (timeouts/retries/fallback).
 - tokensOut
 - costUsd
 - createdAt
+
 Purpose: billing source of truth for rollups.
 
 **IdempotencyKey**
@@ -164,14 +174,16 @@ Purpose: billing source of truth for rollups.
 - responseJson
 - createdAt
 - Unique constraint (tenantId, key)
+
 Purpose: safe retries without double-writing/double-billing.
 
 ### Provider Adapter Interface
 
-**Design intent**
+**Design Intent**
+
 Normalize vendor differences behind a single interface so adding a new vendor only requires implementing one adapter.
 
-Interface (conceptual)
+- Interface (conceptual)
 `providers.generateReply({ systemPrompt, messages, timeoutMs, requestId }) -> { outputText, tokensIn, tokensOut, latencyMs, raw }`
 
 VendorA adapter (mock)
@@ -204,6 +216,7 @@ Adapters map vendor responses into the unified shape used by the gateway.
     - TIMEOUT
 
 **Fallback**
+
 Flow for a message:
 1. Try primary provider with timeout + retries
 2. If still failing and fallbackProvider configured:
@@ -215,6 +228,7 @@ ProviderCallEvent rows are written for attempts, so fallback behavior is observa
 ### Idempotency Approach
 
 **Goal**
+
 Prevent double-writes (duplicate messages) and double-charging (duplicate usage events) when a client retries.
 
 **Mechanism**
@@ -234,6 +248,7 @@ This ensures safe retries and prevents accidental double-billing.
 ### Usage Metering & Billing Preview
 
 **Usage event creation**
+
 For each assistant response:
 - tokensIn/out computed from provider response
 - cost computed using a fixed pricing table:
@@ -242,6 +257,7 @@ For each assistant response:
 - persist `UsageEvent(tenantId, agentId, sessionId, provider, tokensIn, tokensOut, costUsd)`
 
 **Rollups**
+
 Billing endpoint returns:
 - Totals: sessions, tokens, cost
 - Breakdown by provider

@@ -15,6 +15,7 @@ A multi-tenant AI agent gateway with reliability features (timeouts, retries, fa
     - Vite (v4 – Node 16 compatible)
 
 **1. Run the Backend**
+
 From the repo root:
 - `npm install`
 - `npm run db:reset`  # Reset DB
@@ -22,6 +23,7 @@ From the repo root:
 - `npm run dev`     # Start Server at http://localhost:3001
 
 **2. Run the Frontend**
+
 Open a new terminal:
 - `cd apps/web`
 - `npm install`
@@ -61,6 +63,7 @@ The seed script creates 2 tenants and 3 agents with different fallback configs.
     ```
 
 - Send a message:
+    ```
     curl -X POST http://localhost:3001/gateway/sessions/SESSION_ID/messages \
      -H "x-api-key: YOUR_API_KEY" \
      -H "Content-Type: application/json" \
@@ -68,11 +71,13 @@ The seed script creates 2 tenants and 3 agents with different fallback configs.
         "content": "Hello!",
         "idempotencyKey": "msg-001"
     }'
+    ```
 
 - Usage & billing rollup:
+    ```
     curl "http://localhost:3001/billing/usage?from=2025-01-01&to=2025-12-31" \
      -H "x-api-key: YOUR_API_KEY"
-
+    ```
 
 **5. Tests**
 - Run all tests (unit + integration):

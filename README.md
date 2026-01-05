@@ -11,7 +11,7 @@ A multi-tenant AI agent gateway with reliability features (timeouts, retries, fa
     - Jest (tests)
 
 - Frontend
-    - React (TypeScript)
+    - React (JavaScript)
     - Vite (v4 – Node 16 compatible)
 
 **1. Run the Backend**

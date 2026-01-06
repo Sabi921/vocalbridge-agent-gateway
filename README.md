@@ -38,14 +38,14 @@ The seed script creates 2 tenants and 3 agents with different fallback configs.
 - Create a Tenant:
     ```
     curl -X POST http://localhost:3001/tenants/create \
-        -H "Content-Type: application/json" \
-        -d '{"name":"Tenant A"}'
+     -H "Content-Type: application/json" \
+     -d '{"name":"Tenant A"}'
     ```
 
 - List Agents:
     ```
     curl http://localhost:3001/agents \
-        -H "x-api-key: YOUR_API_KEY"
+     -H "x-api-key: YOUR_API_KEY"
     ```
 
 - Create an agent:
@@ -64,11 +64,11 @@ The seed script creates 2 tenants and 3 agents with different fallback configs.
 - Update an agent:
     ```
     curl -X PUT http://localhost:3001/agents/AGENT_ID \
-        -H "x-api-key: YOUR_API_KEY" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "name": "Updated Agent"
-        }'
+     -H "x-api-key: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+        "name": "Updated Agent"
+    }'
     ```
 
 - Create a conversation session:
